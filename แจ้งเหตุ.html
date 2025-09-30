@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แจ้งพิกัดด่วน</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; background-color: #f0f2f5; margin: 0; }
+        .container { padding: 2rem 1.5rem; background-color: white; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); max-width: 400px; }
+        h1 { color: #1c1e21; margin-bottom: 0.5rem; }
+        p { color: #606770; margin-top: 0; }
+        button { background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); color: white; border: none; padding: 16px 32px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(79, 172, 254, 0.4); }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(79, 172, 254, 0.6); }
+        button:disabled { background: #ccd0d5; cursor: not-allowed; box-shadow: none; transform: none; }
+        #status { margin-top: 1rem; color: #333; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ศูนย์ช่วยเหลือผู้ประสบภัย</h1>
+        <p>กดปุ่มด้านล่างเพื่อดึงพิกัดปัจจุบันของคุณ แล้วกรอกข้อมูลแจ้งเหตุ</p>
+        <button id="getLocationBtn" onclick="getLocation()">📍 กดเพื่อแจ้งเหตุที่นี่</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        function getLocation() {
+            const status = document.getElementById('status');
+            const button = document.getElementById('getLocationBtn');
+            status.textContent = '🛰️ กำลังค้นหาพิกัด...';
+            button.disabled = true;
+
+            if (!navigator.geolocation) {
+                status.textContent = "ข้อผิดพลาด: เบราว์เซอร์ไม่รองรับ Geolocation";
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    // --- ⬇️⬇️⬇️ [แก้ไขส่วนนี้] ⬇️⬇️⬇️ ---
+                    const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScuoUkFuLN9nmBYbtuEGVXqWmB1-Emt-BnXFzSJLfCa0CgE3w/viewform";
+                    const LATITUDE_ENTRY_ID = "entry.1052841070";
+                    const LONGITUDE_ENTRY_ID = "entry.1200776748";
+                    // --- ⬆️⬆️⬆️ [จบส่วนแก้ไข] ⬆️⬆️⬆️ ---
+
+                    const prefilledUrl = `${FORM_URL}?usp=pp_url&${LATITUDE_ENTRY_ID}=${lat}&${LONGITUDE_ENTRY_ID}=${lon}`;
+                    status.textContent = `✅ พบพิกัดแล้ว! กำลังเปิดฟอร์ม...`;
+                    window.location.href = prefilledUrl;
+                },
+                () => {
+                    status.textContent = "❌ ไม่สามารถเข้าถึงตำแหน่งได้ (โปรดกดยินยอม/Allow บน Pop-up)";
+                    button.disabled = false;
+                }
+            );
+        }
+    </script>
+</body>
+</html>
