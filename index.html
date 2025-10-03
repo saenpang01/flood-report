@@ -7,36 +7,29 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
     <div class="app-container">
         <div id="map"></div>
         <div class="sidebar">
             <h2 style="text-align: center; margin-top: 0;">รายการแจ้งเหตุ</h2>
-            
-            <select id="case-selector" class="case-selector">
-                <option value="all">แสดงทุกเคส</option>
-            </select>
-            
             <button id="report-btn">📍 แจ้งเหตุที่ตำแหน่งนี้</button>
-            <p id="loading">กำลังโหลดข้อมูล...</p>
-
+            <p id="geolocation-status" class="status-error"></p> <p id="loading">กำลังโหลดข้อมูล...</p>
             <div id="card-container"></div>
         </div>
     </div>
-
-   <template id="card-template">
-    <div class="card">
-        <img class="card-media card-image" src="" alt="รูปภาพเหตุการณ์" style="display:none;">
-        <div class="card-media card-video-container" style="display:none;">
-             <iframe class="card-video" frameborder="0" allowfullscreen></iframe>
+    <template id="card-template">
+        <div class="card">
+            <img class="card-media card-image" src="" alt="รูปภาพเหตุการณ์">
+            <div class="card-media card-video-container">
+                 <iframe class="card-video" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="card-status"></div>
+            <h3>ประเภท: <span class="type"></span></h3>
+            <p class="details"></p>
         </div>
-        <div class="card-status"></div>
-        <h3>ประเภท: <span class="type"></span></h3>
-        <p class="details"></p>
-    </div>
-</template>
+    </template>
     
     <script src="app.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlLrwOhyIVX-fZzzo9WibIG2nJqHVlxS8&libraries=marker&callback=initApp" defer></script>
 </body>
+
 </html>
