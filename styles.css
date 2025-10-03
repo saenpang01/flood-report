@@ -1,4 +1,4 @@
-/* General Body and HTML styles */
+/* (โค้ดส่วนใหญ่เหมือนเดิม) */
 body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 .app-container { display: flex; height: 100vh; flex-direction: column; } /* ปรับสำหรับมือถือ */
 #map { flex: 1; height: 50%; }
@@ -10,88 +10,13 @@ body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, Bl
     .sidebar { height: 100%; }
 }
 #loading { text-align: center; font-size: 1.2em; }
-/* Card Container */
 .card-container { margin-top: 20px; }
-/* Individual Card */
-.card { 
-    background: #fff; 
-    border-radius: 8px; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-    padding: 15px; 
-    margin-bottom: 15px; 
-    transition: transform 0.2s, box-shadow 0.2s; /* เพิ่ม transition */
-    cursor: pointer; /* เพิ่ม cursor เพื่อบ่งบอกว่าคลิกได้ */
-}
-/* Highlight card on map marker click or hover */
-.card.highlight { 
-    transform: scale(1.02); 
-    box-shadow: 0 8px 16px rgba(0, 123, 255, 0.3); 
-    border: 1px solid #007bff; /* เพิ่มขอบ */
-}
-.card h3 { margin-top: 0; font-size: 1.1em; }
-
-/* Card Media (Image/Video) */
-.card-media { 
-    display: none; /* ซ่อนไว้ก่อน จะแสดงเมื่อมีลิงก์ */
-    width: 100%; 
-    height: auto; 
-    max-height: 200px; /* จำกัดความสูงของรูป/วิดีโอ */
-    object-fit: cover; /* ทำให้รูปพอดี */
-    border-radius: 4px; 
-    margin-bottom: 10px; 
-}
-.card-video-container { 
-    display: none; /* ซ่อนไว้ก่อน จะแสดงเมื่อมีลิงก์ */
-    position: relative; 
-    padding-bottom: 56.25%; /* อัตราส่วน 16:9 */
-    height: 0; 
-    overflow: hidden; 
-    margin-bottom: 10px; 
-    border-radius: 4px;
-}
-.card-video { 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    border: none; /* เอาขอบ iframe ออก */
-}
-
-/* Card Status Badge */
-.card-status { font-weight: bold; padding: 8px 12px; border-radius: 5px; text-align: center; margin-bottom: 15px; font-size: 1em; }
-.status-pending { background-color: #ffeaa7; color: #d35400; } /* ยังไม่ดำเนินการ / กำลังดำเนินการ */
-.status-completed { background-color: #badc58; color: #2d3436; } /* สำเร็จ */
-
-/* Dropdown for Status */
-.status-dropdown {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f8f8f8;
-    font-family: inherit;
-    font-size: 14px;
-    margin-top: 10px;
-    cursor: pointer;
-}
-.status-dropdown:disabled {
-    background-color: #e9ecef;
-    cursor: not-allowed;
-    color: #6c757d;
-}
-.case-selector {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    background-color: #fff;
-}
-
-/* Report Button */
-#report-btn { width: 100%; padding: 15px; font-size: 18px; font-weight: bold; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 20px; transition: all 0.3s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-#report-btn:hover { background-color: #c82333; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
-
-#report-btn:disabled { background-color: #6c757d; cursor: not-allowed; transform: none; box-shadow: none; }
+.card { background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 15px; margin-bottom: 15px; }
+.card-media, .card-video-container { display: none; width: 100%; border-radius: 4px; margin-bottom: 10px; }
+.card-video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+.card-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.card-status { font-weight: bold; padding: 8px 12px; border-radius: 5px; text-align: center; margin-bottom: 15px; }
+.status-pending { background-color: #ffeaa7; color: #d35400; }
+.status-completed { background-color: #badc58; color: #2d3436; }
+#report-btn { width: 100%; padding: 15px; font-size: 18px; font-weight: bold; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 20px; }
+.status-error { color: #c82333; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px; padding: 10px; margin-top: -10px; margin-bottom: 20px; text-align: center; display: none; }
