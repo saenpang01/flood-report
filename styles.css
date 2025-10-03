@@ -1,12 +1,14 @@
 /* General Body and HTML styles */
 body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-/* Main Application Container */
-.app-container { display: flex; height: 100vh; }
-/* Map Panel */
-#map { flex: 2; height: 100%; background-color: #e0e0e0; }
-/* Sidebar Panel */
-.sidebar { flex: 1; height: 100%; overflow-y: auto; background-color: #f4f4f9; padding: 20px; box-sizing: border-box; }
-/* Loading Message */
+.app-container { display: flex; height: 100vh; flex-direction: column; } /* ปรับสำหรับมือถือ */
+#map { flex: 1; height: 50%; }
+.sidebar { flex: 1; height: 50%; overflow-y: auto; background-color: #f4f4f9; padding: 20px; box-sizing: border-box; }
+/* ทำให้ปรับขนาดตามหน้าจอได้ดีขึ้น */
+@media (min-width: 768px) {
+    .app-container { flex-direction: row; }
+    #map { height: 100%; }
+    .sidebar { height: 100%; }
+}
 #loading { text-align: center; font-size: 1.2em; }
 /* Card Container */
 .card-container { margin-top: 20px; }
@@ -91,4 +93,5 @@ body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, Bl
 /* Report Button */
 #report-btn { width: 100%; padding: 15px; font-size: 18px; font-weight: bold; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 20px; transition: all 0.3s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
 #report-btn:hover { background-color: #c82333; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+
 #report-btn:disabled { background-color: #6c757d; cursor: not-allowed; transform: none; box-shadow: none; }
