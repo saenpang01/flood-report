@@ -1,22 +1,186 @@
-/* (โค้ดส่วนใหญ่เหมือนเดิม) */
-body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-.app-container { display: flex; height: 100vh; flex-direction: column; } /* ปรับสำหรับมือถือ */
-#map { flex: 1; height: 50%; }
-.sidebar { flex: 1; height: 50%; overflow-y: auto; background-color: #f4f4f9; padding: 20px; box-sizing: border-box; }
-/* ทำให้ปรับขนาดตามหน้าจอได้ดีขึ้น */
-@media (min-width: 768px) {
-    .app-container { flex-direction: row; }
-    #map { height: 100%; }
-    .sidebar { height: 100%; }
+/* General Body and HTML styles */
+body, html { 
+    margin: 0; 
+    padding: 0; 
+    height: 100%; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
 }
-#loading { text-align: center; font-size: 1.2em; }
-.card-container { margin-top: 20px; }
-.card { background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 15px; margin-bottom: 15px; }
-.card-media, .card-video-container { display: none; width: 100%; border-radius: 4px; margin-bottom: 10px; }
-.card-video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-.card-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-.card-status { font-weight: bold; padding: 8px 12px; border-radius: 5px; text-align: center; margin-bottom: 15px; }
-.status-pending { background-color: #ffeaa7; color: #d35400; }
-.status-completed { background-color: #badc58; color: #2d3436; }
-#report-btn { width: 100%; padding: 15px; font-size: 18px; font-weight: bold; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 20px; }
-.status-error { color: #c82333; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px; padding: 10px; margin-top: -10px; margin-bottom: 20px; text-align: center; display: none; }
+
+/* Main Application Container */
+.app-container { 
+    display: flex; 
+    height: 100vh; 
+    flex-direction: column; /* Default for mobile */
+}
+/* Responsive layout for larger screens */
+@media (min-width: 768px) {
+    .app-container { 
+        flex-direction: row; 
+    }
+}
+
+/* Map Panel */
+#map { 
+    flex: 1; 
+    height: 50%; 
+    background-color: #e0e0e0; 
+}
+@media (min-width: 768px) { 
+    #map { 
+        height: 100%; 
+        flex: 2; 
+    } 
+}
+
+/* Sidebar Panel */
+.sidebar { 
+    flex: 1; 
+    height: 50%; 
+    overflow-y: auto; 
+    background-color: #f4f4f9; 
+    padding: 20px; 
+    box-sizing: border-box; 
+}
+@media (min-width: 768px) { 
+    .sidebar { 
+        height: 100%; 
+    } 
+}
+
+/* Loading Message */
+#loading { 
+    text-align: center; 
+    font-size: 1.2em; 
+}
+
+/* Report Button */
+#report-btn { 
+    width: 100%; 
+    padding: 15px; 
+    font-size: 18px; 
+    font-weight: bold; 
+    background-color: #dc3545; 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    margin-bottom: 20px; 
+}
+#report-btn:disabled { 
+    background-color: #6c757d; 
+    cursor: not-allowed; 
+}
+
+/* Geolocation Status/Error Message */
+.status-error { 
+    color: #c82333; 
+    background-color: #f8d7da; 
+    border: 1px solid #f5c6cb; 
+    border-radius: 5px; 
+    padding: 10px; 
+    margin-top: -10px; 
+    margin-bottom: 20px; 
+    text-align: center; 
+    display: none; 
+}
+
+/* --- Accordion Styles --- */
+.accordion-container { 
+    margin-top: 20px; 
+}
+
+.accordion-item { 
+    border-radius: 8px; 
+    margin-bottom: 10px; 
+    background-color: #fff; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+    overflow: hidden; /* Important for animation */
+}
+
+.accordion-header {
+    width: 100%;
+    background-color: #fff;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.accordion-header.active { 
+    background-color: #e7f1ff; 
+    font-weight: bold;
+}
+
+.accordion-header::after {
+    content: '\\25BC'; /* Down arrow */
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.accordion-header.active::after {
+    transform: rotate(180deg); /* Up arrow */
+}
+
+.accordion-content {
+    max-height: 0; /* Hidden by default */
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    padding: 0 15px; /* Padding will apply when opened */
+}
+
+.accordion-content p { 
+    margin: 10px 0; 
+}
+
+.accordion-content .card-media, .accordion-content .card-video-container { 
+    margin-top: 15px; 
+}
+
+.card-media, .card-video-container { 
+    display: none; 
+    width: 100%; 
+    border-radius: 4px; 
+    margin-bottom: 10px; 
+    max-height: 200px; 
+    object-fit: cover; 
+}
+
+.card-video-container { 
+    position: relative; 
+    padding-bottom: 56.25%; 
+    height: 0; 
+    overflow: hidden; 
+}
+
+.card-video { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    border: none;
+}
+
+.card-status { 
+    font-weight: bold; 
+    padding: 8px 12px; 
+    border-radius: 5px; 
+    text-align: center; 
+    margin-bottom: 15px; 
+}
+
+.status-pending { 
+    background-color: #ffeaa7; 
+    color: #d35400; 
+}
+
+.status-completed { 
+    background-color: #badc58; 
+    color: #2d3436; 
+}

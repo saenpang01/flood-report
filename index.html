@@ -12,24 +12,29 @@
         <div class="sidebar">
             <h2 style="text-align: center; margin-top: 0;">รายการแจ้งเหตุ</h2>
             <button id="report-btn">📍 แจ้งเหตุที่ตำแหน่งนี้</button>
-            <p id="geolocation-status" class="status-error"></p> <p id="loading">กำลังโหลดข้อมูล...</p>
-            <div id="card-container"></div>
+            <p id="geolocation-status" class="status-error"></p>
+            <p id="loading">กำลังโหลดข้อมูล...</p>
+            <div id="accordion-container" class="accordion-container"></div>
         </div>
     </div>
-    <template id="card-template">
-        <div class="card">
-            <img class="card-media card-image" src="" alt="รูปภาพเหตุการณ์">
-            <div class="card-media card-video-container">
-                 <iframe class="card-video" frameborder="0" allowfullscreen></iframe>
+
+    <template id="accordion-item-template">
+        <div class="accordion-item">
+            <button class="accordion-header">
+                <span class="header-title"></span>
+            </button>
+            <div class="accordion-content">
+                <div class="card-status"></div>
+                <p class="details"></p>
+                <img class="card-media card-image" src="" alt="รูปภาพเหตุการณ์">
+                <div class="card-media card-video-container">
+                     <iframe class="card-video" frameborder="0" allowfullscreen></iframe>
+                </div>
             </div>
-            <div class="card-status"></div>
-            <h3>ประเภท: <span class="type"></span></h3>
-            <p class="details"></p>
         </div>
     </template>
     
     <script src="app.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlLrwOhyIVX-fZzzo9WibIG2nJqHVlxS8&libraries=marker&callback=initApp" defer></script>
 </body>
-
 </html>
