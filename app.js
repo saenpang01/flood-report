@@ -4,7 +4,7 @@
 
 // --- ⬇️⬇️⬇️ [ส่วน CONFIGURATION] ⬇️⬇️⬇️ ---
         const API_URL = 'https://script.google.com/macros/s/AKfycbzGA2Gz0bZsQW7N-jz4DAi2x8q3reHuMUNDtrLRHrU0QcNw8rWf4nWNHe5eZQqJdOug/exec'; 
-        const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScuoUkFuLN9nmBYbtuEGVXqWmB1-Emt-BnXFzSJLfCa0CgE3w/viewform?usp=dialog';
+        const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScuoUkFuLN9nmBYbtuEGVXqWmB1-Emt-BnXFzSJLfCa0CgE3w/viewform';
         const LATITUDE_ENTRY_ID = 'entry.1052841070';
         const LONGITUDE_ENTRY_ID = 'entry.1200776748';
 // Global variables
@@ -292,4 +292,4 @@ async function updateStatus(rowIndex, newStatus, dropdownElement, cardElement) {
         cardElement.style.opacity = 1; // คืนความทึบแสง
     }
 
-}
+
