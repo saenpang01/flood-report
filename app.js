@@ -292,4 +292,5 @@ async function updateStatus(rowIndex, newStatus, dropdownElement, cardElement) {
         cardElement.style.opacity = 1; // คืนความทึบแสง
     }
 
+}
 
