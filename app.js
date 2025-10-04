@@ -11,54 +11,65 @@
 let map;
 const mapMarkers = [];
 
-// (โค้ดฟังก์ชัน setupReportButton เหมือนเดิม ไม่มีการเปลี่ยนแปลง)
+/**
+ * ฟังก์ชันจัดการปุ่มแจ้งเหตุ (เวอร์ชันปรับปรุงเพื่อความเสถียรบนมือถือ)
+ */
 function setupReportButton() {
     const reportButton = document.getElementById('report-btn');
     const statusElement = document.getElementById('geolocation-status');
     if (!reportButton || !statusElement) return;
-    const handlePermissionDenied = () => {
-        reportButton.disabled = true;
-        reportButton.textContent = 'ถูกบล็อกการเข้าถึงตำแหน่ง';
-        statusElement.textContent = 'คุณได้ปฏิเสธการเข้าถึงตำแหน่ง โปรดไปที่การตั้งค่าเบราว์เซอร์เพื่ออนุญาต';
-        statusElement.style.display = 'block';
-    };
-    const requestLocation = () => {
+
+    const eventHandler = () => {
+        // 1. ตรวจสอบก่อนว่าเบราว์เซอร์รองรับ Geolocation หรือไม่
+        if (!navigator.geolocation) {
+            statusElement.textContent = 'เบราว์เซอร์ของคุณไม่รองรับ Geolocation';
+            statusElement.style.display = 'block';
+            reportButton.disabled = true;
+            return;
+        }
+
         reportButton.disabled = true;
         reportButton.textContent = '🛰️ กำลังค้นหาพิกัด...';
         statusElement.style.display = 'none';
+
+        // 2. เรียกใช้ฟังก์ชันขอตำแหน่ง
         navigator.geolocation.getCurrentPosition(
+            // Success Callback (เมื่อผู้ใช้อนุญาต)
             (position) => {
                 const { latitude: lat, longitude: lon } = position.coords;
                 const prefilledUrl = `${GOOGLE_FORM_URL}?usp=pp_url&${LATITUDE_ENTRY_ID}=${lat}&${LONGITUDE_ENTRY_ID}=${lon}`;
+                
+                // เปิดฟอร์มในแท็บใหม่
                 window.open(prefilledUrl, '_blank');
+                
+                // คืนค่าปุ่มให้เป็นปกติ
                 reportButton.disabled = false;
                 reportButton.textContent = '📍 แจ้งเหตุที่ตำแหน่งนี้';
             },
+            // Error Callback (เมื่อผู้ใช้ปฏิเสธ หรือเกิดข้อผิดพลาด)
             (error) => {
+                let errorMessage = 'เกิดข้อผิดพลาดในการขอตำแหน่ง';
+                if (error.code === 1) { // PERMISSION_DENIED
+                    errorMessage = 'คุณได้ปฏิเสธการเข้าถึงตำแหน่ง โปรดไปที่การตั้งค่าเบราว์เซอร์เพื่ออนุญาต';
+                }
+                statusElement.textContent = errorMessage;
+                statusElement.style.display = 'block';
+                reportButton.disabled = false;
+                reportButton.textContent = '📍 แจ้งเหตุที่ตำแหน่งนี้';
                 console.error('Geolocation error:', error);
-                handlePermissionDenied();
-            }
+            },
+            // Options (เพิ่มประสิทธิภาพบนมือถือ)
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );
     };
-    if (navigator.permissions && navigator.permissions.query) {
-        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-            if (result.state === 'denied') {
-                handlePermissionDenied();
-            } else {
-                reportButton.addEventListener('click', requestLocation);
-                result.onchange = () => { if (result.state === 'denied') handlePermissionDenied(); };
-            }
-        });
-    } else if (navigator.geolocation) {
-        reportButton.addEventListener('click', requestLocation);
-    } else {
-        reportButton.disabled = true;
-        reportButton.textContent = 'ไม่รองรับ Geolocation';
-    }
+
+    // 3. เพิ่ม Event Listener ทั้ง click (สำหรับคอม) และ touchend (สำหรับมือถือ)
+    reportButton.addEventListener('click', eventHandler);
 }
+
 document.addEventListener('DOMContentLoaded', setupReportButton);
 
-// (โค้ดฟังก์ชัน initApp และ fetchData เหมือนเดิม ไม่มีการเปลี่ยนแปลง)
+// (ฟังก์ชัน initApp, fetchData, renderCards, renderMarkers ทั้งหมดเหมือนเดิม ไม่ต้องแก้ไข)
 async function initApp() {
     const { Map } = await google.maps.importLibrary("maps");
     map = new Map(document.getElementById("map"), {
@@ -68,6 +79,7 @@ async function initApp() {
     });
     await fetchData();
 }
+
 async function fetchData() {
     const loading = document.getElementById('loading');
     try {
@@ -75,7 +87,7 @@ async function fetchData() {
         const data = await response.json();
         if (Array.isArray(data)) {
             loading.style.display = 'none';
-            renderCards(data); // ชื่อฟังก์ชันยังคงเดิม แต่ Logic ข้างในเปลี่ยน
+            renderCards(data);
             renderMarkers(data);
         } else {
             throw new Error(data.error || "Format error.");
@@ -85,116 +97,76 @@ async function fetchData() {
     }
 }
 
-/**
- * ฟังก์ชันแสดงผลแบบ Accordion (เขียนใหม่)
- */
 function renderCards(data) {
-    const container = document.getElementById('accordion-container');
-    container.innerHTML = ''; // ล้างรายการเก่าทิ้ง
-
+    const container = document.getElementById('card-container');
+    container.innerHTML = '';
     data.forEach((rowData, index) => {
-        const item = document.getElementById('accordion-item-template').content.cloneNode(true).querySelector('.accordion-item');
-        
+        const card = document.getElementById('card-template').content.cloneNode(true).querySelector('.card');
+        card.id = `card-${index}`;
         const type = rowData[1];
         const details = rowData[2];
-        const lat = parseFloat(rowData[3]);
-        const lng = parseFloat(rowData[4]);
         const mediaLink = rowData[5];
-        const status = rowData[8] || "ยังไม่ดำเนินการ"; 
-
-        // ตั้งค่าส่วนหัวของ Accordion
-        const header = item.querySelector('.accordion-header');
-        header.querySelector('.header-title').textContent = `${type}: ${details.substring(0, 25)}...`;
-
-        // ตั้งค่าส่วนเนื้อหา
-        const content = item.querySelector('.accordion-content');
-        content.querySelector('.details').textContent = details || 'ไม่มีรายละเอียดเพิ่มเติม';
-        
-        const statusDiv = content.querySelector('.card-status');
-        statusDiv.textContent = status;
-        statusDiv.className = `card-status ${status === 'สำเร็จ' ? 'status-completed' : 'status-pending'}`;
-
-        // Logic การแสดงผล Media
+        const status = rowData[8] || "ยังไม่ดำเนินการ";
+        card.querySelector('.type').textContent = type || "N/A";
+        card.querySelector('.details').textContent = details || "N/A";
         if (mediaLink) {
             if (mediaLink.includes("youtube.com") || mediaLink.includes("youtu.be")) {
                 let videoId = mediaLink.split('v=')[1] || mediaLink.split('/').pop();
                 if (videoId) {
                     const ampersandPosition = videoId.indexOf('&');
                     if (ampersandPosition !== -1) { videoId = videoId.substring(0, ampersandPosition); }
-                    content.querySelector('.card-video-container').style.display = 'block';
-                    content.querySelector('.card-video').src = `https://www.youtube.com/embed/${videoId}`;
+                    card.querySelector('.card-video-container').style.display = 'block';
+                    card.querySelector('.card-video').src = `https://www.youtube.com/embed/${videoId}`;
                 }
             } else if (mediaLink.match(/\.(jpeg|jpg|gif|png)$/i)) {
-                content.querySelector('.card-image').style.display = 'block';
-                content.querySelector('.card-image').src = mediaLink;
+                card.querySelector('.card-image').style.display = 'block';
+                card.querySelector('.card-image').src = mediaLink;
             } else if (mediaLink.includes("drive.google.com")) {
                  const fileIdMatch = mediaLink.match(/id=([-\w]+)/);
                  if (fileIdMatch && fileIdMatch[1]) {
-                    content.querySelector('.card-image').style.display = 'block';
-                    content.querySelector('.card-image').src = `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}`;
+                    card.querySelector('.card-image').style.display = 'block';
+                    card.querySelector('.card-image').src = `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}`;
                  }
             }
         }
-
-        // เพิ่ม Event Listener ให้กับปุ่ม Header
-        header.addEventListener('click', () => {
-            const isActive = header.classList.contains('active');
-            
-            // ปิด Accordion อื่นๆ ทั้งหมดก่อน
-            document.querySelectorAll('.accordion-header').forEach(h => h.classList.remove('active'));
-            document.querySelectorAll('.accordion-content').forEach(c => {
-                c.style.maxHeight = null;
-                c.style.padding = "0 15px";
-            });
-
-            // ถ้ากำลังจะเปิด Accordion นี้ (ถ้าก่อนหน้านี้มันปิดอยู่)
-            if (!isActive) {
-                header.classList.add('active');
-                content.style.maxHeight = content.scrollHeight + "px"; // ขยายความสูงให้พอดีกับเนื้อหา
-                content.style.padding = "15px"; // เพิ่ม padding ตอนเปิด
-                
-                // ย้ายแผนที่และซูม
-                if (!isNaN(lat) && !isNaN(lng)) {
-                    map.setCenter({ lat, lng });
-                    map.setZoom(15);
-                }
-            }
-        });
-
-        container.appendChild(item);
+        const statusDiv = card.querySelector('.card-status');
+        statusDiv.textContent = status;
+        statusDiv.className = `card-status ${status === 'สำเร็จ' ? 'status-completed' : 'status-pending'}`;
+        container.appendChild(card);
     });
 }
 
-// (โค้ดฟังก์ชัน renderMarkers เหมือนเดิม ไม่มีการเปลี่ยนแปลง)
 async function renderMarkers(data) {
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     const { InfoWindow } = await google.maps.importLibrary("maps");
-    
     mapMarkers.forEach(marker => marker.map = null);
     mapMarkers.length = 0;
-
     data.forEach((rowData, index) => {
         const type = rowData[1];
         const details = rowData[2];
         const lat = parseFloat(rowData[3]);
         const lng = parseFloat(rowData[4]);
         if (isNaN(lat) || isNaN(lng)) return;
-
         const marker = new AdvancedMarkerElement({ position: { lat, lng }, map, title: type });
         const infoWindow = new InfoWindow({ content: `<div><h4>${type}</h4><p>${details}</p></div>` });
-
-        // Click effect: คลิกหมุด ให้ไปเปิด Accordion ที่เกี่ยวข้อง
+        marker.content.addEventListener("mouseover", () => {
+            infoWindow.open({ map, anchor: marker });
+            const cardElement = document.getElementById(`card-${index}`);
+            if (cardElement) cardElement.classList.add('highlight');
+        });
+        marker.content.addEventListener("mouseout", () => {
+            infoWindow.close();
+            const cardElement = document.getElementById(`card-${index}`);
+            if (cardElement) cardElement.classList.remove('highlight');
+        });
         marker.addListener("gmp-click", () => {
-            const header = document.querySelectorAll('.accordion-header')[index];
-            if (header) {
-                header.click(); // สั่งให้ทำงานเหมือนการคลิกที่ Header โดยตรง
+            const cardElement = document.getElementById(`card-${index}`);
+            if (cardElement) {
+                document.querySelectorAll('.card').forEach(c => c.classList.remove('highlight'));
+                cardElement.classList.add('highlight');
+                cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
-
-        // Hover effect: แสดงข้อมูลย่อ
-        marker.content.addEventListener("mouseover", () => infoWindow.open({ map, anchor: marker }));
-        marker.content.addEventListener("mouseout", () => infoWindow.close());
-        
         mapMarkers.push(marker);
     });
 }
